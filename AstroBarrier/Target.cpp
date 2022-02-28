@@ -5,9 +5,6 @@
 #include <ssd1306xled.h>
 #include <font6x8.h>
 
-#define screenWidth 128   
-#define screenHeight 8
-
 Target::Target(uint8_t _size, uint8_t _speed, uint8_t _x0, uint8_t _y0)
 {
   this->size = _size;                        // the size of the target (8, 16 or 32)

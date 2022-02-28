@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.1.0
+// V0.2.0
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -10,6 +10,7 @@
 
 #include "Button.h"
 #include "Target.h"
+#include "Player.h"
 
 #define actionButtons A3
 #define directionButtons A2
@@ -24,6 +25,8 @@ Target t1(32, 3, 0, 0);
 Target t2(16, 5, 0, 4);
 Target t3(8, 9, 0, 6);
 
+Player player;
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
   SSD1306.ssd1306_init();             
@@ -35,7 +38,19 @@ void loop() {
   t1.drawTarget();
   t2.drawTarget();
   t3.drawTarget();
+  player.drawPlayer();
   delay(50);
+
+  if (LEFT.isPressed())
+  {
+    player.drawBlank();
+    player.moveLeft();
+  }
+  if (RIGHT.isPressed())
+  {
+    player.drawBlank();
+    player.moveRight();
+  }
    
   if (t1.isActive())
   {
