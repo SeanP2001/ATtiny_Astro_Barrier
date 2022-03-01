@@ -21,6 +21,8 @@ public:
 
   bool isActive();
 
+  void isHit();
+
   void updateTarget();
 
   void drawTarget();
