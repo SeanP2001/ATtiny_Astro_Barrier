@@ -18,8 +18,6 @@ public:
   void moveLeft();
 
   void moveRight();
-
-  void shoot();
 };
 
 

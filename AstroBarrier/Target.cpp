@@ -5,17 +5,34 @@
 #include <ssd1306xled.h>
 #include <font6x8.h>
 
-Target::Target(uint8_t _size, uint8_t _speed, uint8_t _x0, uint8_t _y0)
+Target::Target()
 {
-  this->size = _size;                        // the size of the target (8, 16 or 32)
-  this->speed = _speed;                      // the speed which the target moves at (1-25)
-  this->x0 = _x0;                            // x coordinate of the top left corner
-  this->y0 = _y0;                            // y coordinate of the top left corner
-  this->x1 = _x0 + _size;                    // x coordinate of the bottom right corner 
-  this->y1 = _y0 + (_size / 8);              // y coordinate of the bottom right corner
 
-  this->active = true;                       // whether the target is moving or inactive (shot)
-  this->dir = 0;                             // direction of travel (0=right  1=left)
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void Target::configure(uint8_t _size, uint8_t _speed, uint8_t _x0, uint8_t _y0)
+{
+  size = _size;                        // the size of the target (8, 16 or 32)
+  speed = _speed;                      // the speed which the target moves at (1-25)
+  x0 = _x0;                            // x coordinate of the top left corner
+  y0 = _y0;                            // y coordinate of the top left corner
+  x1 = _x0 + _size;                    // x coordinate of the bottom right corner 
+  y1 = _y0 + (_size / 8);              // y coordinate of the bottom right corner
+
+  if (_size == 0)                            // if the size is set to 0, the target is not needed in this level
+    enabled = false;
+  else
+    enabled = true;                    
+  
+  active = true;                       // whether the target is moving or inactive (shot)
+  dir = 0;                             // direction of travel (0=right  1=left)
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+bool Target::isEnabled()
+{
+  return enabled;                                                     
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +80,7 @@ void Target::updateTarget()
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void Target::drawTarget()
-{ 
+{  
   if (size == 8)  
     SSD1306.ssd1306_draw_bmp(x0, y0, x1, y1, smallTarget);
   if (size == 16) 

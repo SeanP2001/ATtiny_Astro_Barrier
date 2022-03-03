@@ -13,11 +13,16 @@ public:
   uint8_t y0;
   uint8_t y1;
 
+  bool enabled;
   bool active;
   bool dir;
 
 
-  Target(uint8_t _size, uint8_t _speed, uint8_t _x0, uint8_t _y0);
+  Target();
+
+  void configure(uint8_t _size, uint8_t _speed, uint8_t _x0, uint8_t _y0);
+
+  bool isEnabled();
 
   bool isActive();
 
