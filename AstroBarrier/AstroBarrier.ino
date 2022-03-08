@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.4.0
+// V0.5.0
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -19,6 +19,7 @@ void drawTargets();                     // draws all enabled targets on the disp
 void checkButtons();                    // checks all of the buttons for user input
 void updateTargets();                   // calculates the positions of all of the targets and removes the target from the display
 bool levelIsComplete();                 // checks if all of the enabled targets have been shot
+bool outOfBullets();                    // checks if the player has run out of bullets
 
 
 #define actionButtons A3
@@ -36,10 +37,11 @@ Target t3;
 Player player;
 
 Bullet bullet;
-
-bool levelComplete = false;
+uint8_t noOfBullets = 3;
+char bulletsStr[1];
 
 char levelStr[2];
+
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,23 +53,32 @@ void setup() {
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void loop() 
 {
-  for(uint8_t levelNo = 1; levelNo < noOfLevels; levelNo++)        // go through every level
+  for(uint8_t levelNo = 1; levelNo <= noOfLevels; levelNo++)       // go through every level
   {     
     setupLevel(levelNo);                                           // load the level information and configure the targets
     
     SSD1306.ssd1306_fillscreen(0x00);                              // clear the screen
-
-    itoa(levelNo, levelStr, 10);  
+   
     SSD1306.ssd1306_setpos(40, 4);
     SSD1306.ssd1306_string_font6x8("Level ");
+    itoa(levelNo, levelStr, 10);
     SSD1306.ssd1306_string_font6x8(levelStr);
+    SSD1306.ssd1306_setpos(32, 5);
+    
+    itoa(noOfBullets, bulletsStr, 10);  
+    SSD1306.ssd1306_string_font6x8(bulletsStr);
+    SSD1306.ssd1306_string_font6x8("x Bullets");
     delay(2000);
 
     SSD1306.ssd1306_fillscreen(0x00);                              // clear the screen
 
-
-    while(!levelIsComplete())                                      // loop until the level has been completed
+    while((!levelIsComplete()) && (!outOfBullets()))               // loop until the level has been completed or the player runs out of bullets
     {
+      itoa(noOfBullets, bulletsStr, 10); 
+      SSD1306.ssd1306_setpos(0, 0);
+      SSD1306.ssd1306_string_font6x8(bulletsStr);
+      SSD1306.ssd1306_string_font6x8("x Bullets");
+      
       if (bullet.fired)                                            // draw the bullet if it has been fired
         bullet.drawBullet();
 
@@ -110,21 +121,38 @@ void loop()
       updateTargets();
     }
 
-    SSD1306.ssd1306_fillscreen(0x00);
-    SSD1306.ssd1306_setpos(16, 4);
-    SSD1306.ssd1306_string_font6x8("Level Complete");
-    delay(2000);
+    if (levelIsComplete())
+    {
+      SSD1306.ssd1306_fillscreen(0x00);
+      SSD1306.ssd1306_setpos(16, 4);
+      SSD1306.ssd1306_string_font6x8("Level Complete");
+      delay(2000);
+      
+      if (levelNo == noOfLevels)
+      {
+        SSD1306.ssd1306_fillscreen(0x00);
+        SSD1306.ssd1306_setpos(16, 4);
+        SSD1306.ssd1306_string_font6x8("Game Complete");
+        delay(2000); 
+      }
+    }
+    else if (outOfBullets())
+    {
+      SSD1306.ssd1306_fillscreen(0x00);
+      SSD1306.ssd1306_setpos(20, 4);
+      SSD1306.ssd1306_string_font6x8("Game Over");
+      delay(2000);
+      break;
+    }
   }
-
-  SSD1306.ssd1306_fillscreen(0x00);
-  SSD1306.ssd1306_setpos(16, 4);
-  SSD1306.ssd1306_string_font6x8("Game Complete");
-  delay(2000);  
+    
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void setupLevel(uint8_t levelNo)
 {
+  noOfBullets = level[levelNo][0];
+  
   t1.configure(level[levelNo][1], level[levelNo][2], level[levelNo][3], level[levelNo][4]);
   t2.configure(level[levelNo][5], level[levelNo][6], level[levelNo][7], level[levelNo][8]);
   t3.configure(level[levelNo][9], level[levelNo][10], level[levelNo][11], level[levelNo][12]);
@@ -156,7 +184,8 @@ void checkButtons()
   }
   if (A.isPressed() && !bullet.fired)
   {
-    bullet.fire((player.playerX0 + 3), (player.playerX1 - 3)); 
+    bullet.fire((player.playerX0 + 3), (player.playerX1 - 3));   // fire a bullet from the current player position
+    noOfBullets--;                                               // deduct 1 from the number of bullets remaining                
   }
 }
 
@@ -191,4 +220,13 @@ bool levelIsComplete()
     return false;
   else
     return true;   
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+bool outOfBullets()
+{
+  if ((noOfBullets == 0) && (!(bullet.fired)))  // if there are no bullets still on the screen and there are no bullets, they are out of bullets
+    return true;
+  else
+    return false;  
 }
