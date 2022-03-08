@@ -1,12 +1,13 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.6.0
+// V0.7.0
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 #include <ssd1306xled.h>
 #include <font6x8.h>
+#include <EEPROM.h>
 
 #include "Button.h"
 #include "Target.h"
@@ -42,6 +43,7 @@ Bullet bullet;
 uint8_t noOfBullets = 3;
 
 int score = 0;
+int highScore = 0;
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +55,8 @@ void setup() {
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void loop() 
 {
+  EEPROM.get(0, highScore);
+  
   for(uint8_t levelNo = 1; levelNo <= noOfLevels; levelNo++)       // go through every level
   {     
     setupLevel(levelNo);                                           // load the level information and configure the targets
@@ -118,14 +122,30 @@ void loop()
       
       if (levelNo == noOfLevels)
       {
-        gameCompleteScreen(score);
+        if (score > highScore)
+        {
+          highScore = score;
+          EEPROM.put(0, highScore);
+          newHighScoreScreen(highScore);
+          delay(2000);
+        }
+        gameCompleteScreen(score, highScore);
         delay(2000); 
+        score = 0;
       }
     }
     else if (outOfBullets())
     {
-      gameOverScreen(score);
+      if (score > highScore)
+      {
+        highScore = score;
+        EEPROM.put(0, highScore);
+        newHighScoreScreen(highScore);
+        delay(2000);
+      }
+      gameOverScreen(score, highScore);
       delay(2000);
+      score = 0;
       break;
     }
   }   

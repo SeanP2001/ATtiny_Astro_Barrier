@@ -6,8 +6,10 @@
 
 void levelScreen(uint8_t levelNo, uint8_t noOfBullets);
 void levelCompleteScreen(int score);
-void gameOverScreen(int score);
-void gameCompleteScreen(int score);
+void newHighScoreScreen(int highScore);
+void gameOverScreen(int score, int highScore);
+void gameCompleteScreen(int score, int highScore);
 void printScore(int score);
+void printHighScore(int highScore);
 
 #endif // _SCREENS_H_
