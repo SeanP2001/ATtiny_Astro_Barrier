@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.5.0
+// V0.5.1
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -13,9 +13,11 @@
 #include "Player.h"
 #include "Bullet.h"
 #include "Levels.h"
+#include "Screens.h"
 
 void setupLevel(uint8_t levelNo);       // loads the level information from the Levels.h file and configures the targets
 void drawTargets();                     // draws all enabled targets on the display
+void showNoOfBullets();                 // show the number of remaining bullets in the corner of the display
 void checkButtons();                    // checks all of the buttons for user input
 void updateTargets();                   // calculates the positions of all of the targets and removes the target from the display
 bool levelIsComplete();                 // checks if all of the enabled targets have been shot
@@ -38,10 +40,6 @@ Player player;
 
 Bullet bullet;
 uint8_t noOfBullets = 3;
-char bulletsStr[1];
-
-char levelStr[2];
-
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,28 +54,16 @@ void loop()
   for(uint8_t levelNo = 1; levelNo <= noOfLevels; levelNo++)       // go through every level
   {     
     setupLevel(levelNo);                                           // load the level information and configure the targets
-    
-    SSD1306.ssd1306_fillscreen(0x00);                              // clear the screen
    
-    SSD1306.ssd1306_setpos(40, 4);
-    SSD1306.ssd1306_string_font6x8("Level ");
-    itoa(levelNo, levelStr, 10);
-    SSD1306.ssd1306_string_font6x8(levelStr);
-    SSD1306.ssd1306_setpos(32, 5);
+    levelScreen(levelNo, noOfBullets);                             // show the level screen (includes level number and number of bullets)
     
-    itoa(noOfBullets, bulletsStr, 10);  
-    SSD1306.ssd1306_string_font6x8(bulletsStr);
-    SSD1306.ssd1306_string_font6x8("x Bullets");
     delay(2000);
 
     SSD1306.ssd1306_fillscreen(0x00);                              // clear the screen
 
     while((!levelIsComplete()) && (!outOfBullets()))               // loop until the level has been completed or the player runs out of bullets
     {
-      itoa(noOfBullets, bulletsStr, 10); 
-      SSD1306.ssd1306_setpos(0, 0);
-      SSD1306.ssd1306_string_font6x8(bulletsStr);
-      SSD1306.ssd1306_string_font6x8("x Bullets");
+      showNoOfBullets();
       
       if (bullet.fired)                                            // draw the bullet if it has been fired
         bullet.drawBullet();
@@ -123,24 +109,18 @@ void loop()
 
     if (levelIsComplete())
     {
-      SSD1306.ssd1306_fillscreen(0x00);
-      SSD1306.ssd1306_setpos(16, 4);
-      SSD1306.ssd1306_string_font6x8("Level Complete");
+      levelCompleteScreen();
       delay(2000);
       
       if (levelNo == noOfLevels)
       {
-        SSD1306.ssd1306_fillscreen(0x00);
-        SSD1306.ssd1306_setpos(16, 4);
-        SSD1306.ssd1306_string_font6x8("Game Complete");
+        gameCompleteScreen();
         delay(2000); 
       }
     }
     else if (outOfBullets())
     {
-      SSD1306.ssd1306_fillscreen(0x00);
-      SSD1306.ssd1306_setpos(20, 4);
-      SSD1306.ssd1306_string_font6x8("Game Over");
+      gameOverScreen();
       delay(2000);
       break;
     }
@@ -167,6 +147,16 @@ void drawTargets()
     t2.drawTarget();
   if (t3.isEnabled())
     t3.drawTarget();
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void showNoOfBullets()
+{
+  char bulletsStr[1];
+  itoa(noOfBullets, bulletsStr, 10); 
+  SSD1306.ssd1306_setpos(0, 0);
+  SSD1306.ssd1306_string_font6x8(bulletsStr);
+  SSD1306.ssd1306_string_font6x8("x Bullets");
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
