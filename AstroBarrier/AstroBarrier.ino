@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.7.0
+// V0.8.0
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -15,6 +15,7 @@
 #include "Bullet.h"
 #include "Levels.h"
 #include "Screens.h"
+#include "TitleScreen.h"
 
 void setupLevel(uint8_t levelNo);       // loads the level information from the Levels.h file and configures the targets
 void drawTargets();                     // draws all enabled targets on the display
@@ -55,7 +56,10 @@ void setup() {
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void loop() 
 {
-  EEPROM.get(0, highScore);
+  EEPROM.get(0, highScore);                                        // Load the high score from EEPROM
+
+  SSD1306.ssd1306_draw_bmp(0, 0, 128, 8, titleScreen);             // Show the title screen
+  delay(2000);
   
   for(uint8_t levelNo = 1; levelNo <= noOfLevels; levelNo++)       // go through every level
   {     
