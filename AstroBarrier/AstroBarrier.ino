@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // ATtiny: Astro Barrier
 // Sean Price
-// V0.8.0
+// V0.9.0
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -16,6 +16,7 @@
 #include "Levels.h"
 #include "Screens.h"
 #include "TitleScreen.h"
+#include "Sound.h"
 
 void setupLevel(uint8_t levelNo);       // loads the level information from the Levels.h file and configures the targets
 void drawTargets();                     // draws all enabled targets on the display
@@ -43,6 +44,9 @@ Player player;
 Bullet bullet;
 uint8_t noOfBullets = 3;
 
+#define buzzerPin 1
+Sound sound(buzzerPin);
+
 int score = 0;
 int highScore = 0;
 
@@ -59,6 +63,7 @@ void loop()
   EEPROM.get(0, highScore);                                        // Load the high score from EEPROM
 
   SSD1306.ssd1306_draw_bmp(0, 0, 128, 8, titleScreen);             // Show the title screen
+  sound.gameStartup();
   delay(2000);
   
   for(uint8_t levelNo = 1; levelNo <= noOfLevels; levelNo++)       // go through every level
@@ -122,6 +127,7 @@ void loop()
       score = score + (noOfBullets * levelNo);
       
       levelCompleteScreen(score);
+      sound.levelComplete();
       delay(2000);
       
       if (levelNo == noOfLevels)
@@ -131,9 +137,11 @@ void loop()
           highScore = score;
           EEPROM.put(0, highScore);
           newHighScoreScreen(highScore);
+          sound.highScore();
           delay(2000);
         }
         gameCompleteScreen(score, highScore);
+        sound.gameComplete();
         delay(2000); 
         score = 0;
       }
@@ -145,9 +153,11 @@ void loop()
         highScore = score;
         EEPROM.put(0, highScore);
         newHighScoreScreen(highScore);
+        sound.highScore();
         delay(2000);
       }
       gameOverScreen(score, highScore);
+      sound.gameOver();
       delay(2000);
       score = 0;
       break;
