@@ -15,7 +15,7 @@
 
 ## Introduction
 
-I created this game to run on my [ATtiny handheld games console]([GitHub - SeanP2001/ATtiny_Handheld_Games_Console: A handheld games console, based on the ATtiny85 AVR microcontroller.](https://github.com/SeanP2001/ATtiny_Handheld_Games_Console)). The game is loosely based on the Club Penguin minigame also called "Astro Barrier".
+I created this game to run on my [ATtiny handheld games console](https://github.com/SeanP2001/ATtiny_Handheld_Games_Console). The game is loosely based on the Club Penguin minigame also called "Astro Barrier".
 
 ## Controls
 
